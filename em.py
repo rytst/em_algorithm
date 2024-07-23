@@ -104,6 +104,56 @@ def main():
         current_likelihood = next_likelihood
 
 
+
+    # ======== visualization ===========
+    trained_phis = phis
+    trained_mus = mus
+    trained_covs = covs
+
+
+    x = np.arange(1, 6, 0.1)
+    y = np.arange(40, 100, 0.1)
+    X, Y = np.meshgrid(x, y)
+
+    Z = np.zeros_like(X)
+
+    for i in range(Z.shape[0]):
+        for j in range(Z.shape[1]):
+            point = np.array([X[i, j], Y[i, j]])
+            Z[i, j] = gmm(point, trained_phis, trained_mus, trained_covs)
+
+
+
+    # plotting
+    plt.scatter(xs[:, 0], xs[:, 1], alpha=0.8)
+    plt.contour(X, Y, Z)
+    plt.xlabel('Eruptions(Min)')
+    plt.ylabel('Waiting(Min)')
+    plt.savefig('trained_gmm.png')
+    plt.clf()
+    # ======== visualization ===========
+
+
+
+    # ========= generate data based on trained GMM ===========
+    N = 500
+    new_xs = np.zeros((N, K))
+    for n in range(N):
+        k = np.random.choice(K, p=trained_phis)
+        mu, cov = mus[k], covs[k]
+        new_xs[n] = np.random.multivariate_normal(mu, cov)
+
+
+    plt.scatter(xs[:, 0], xs[:, 1], alpha=0.7)
+    plt.scatter(new_xs[:, 0], new_xs[:, 1], alpha=0.7)
+    plt.xlabel('Eruptions(Min)')
+    plt.ylabel('Waiting(Min)')
+    plt.savefig('generate.png')
+    # ========= generate data based on trained GMM ===========
+
+
+
+
 if __name__ == "__main__":
     main()
 
